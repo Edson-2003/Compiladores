@@ -1,3 +1,6 @@
+# cd .. && make clean && make && cd bin
+
+
 CC = gcc
 CFLAGS = -Wall -Wextra -I include -ggdb
 

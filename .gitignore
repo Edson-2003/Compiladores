@@ -58,3 +58,4 @@ dkms.conf
 # myfiles
 bin/
 build/
+lib/

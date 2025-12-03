@@ -73,6 +73,7 @@ inserir_estado(struct automoto * automoto, struct estado * estado)
       temp->proximo = estado;
       return;
     }
+    temp = temp->proximo;
   }
   estado->proximo = temp->proximo;
   temp->proximo = estado;
@@ -146,9 +147,10 @@ fecha_transicao(struct estado * origem, struct estado * destino, char label)
 void
 insere_transicao(struct automoto * automoto, struct transicao_info * transicao)
 {
+
   struct estado * estado1 = procurar_estado(automoto, transicao->estado1);
-  struct estado * estado2 = procurar_estado(automoto, transicao->estado2);
-  // struct estado * temp;
+  // struct estado * temp
+
   if(estado1 == NULL)
   {
     estado1 = criar_estado(transicao->estado1, transicao->estado1inicial, transicao->estado1final);
@@ -165,7 +167,16 @@ insere_transicao(struct automoto * automoto, struct transicao_info * transicao)
       estado1->final = transicao->estado1final;
     }
   }
-  
+
+  if((transicao->estado2 == -1) && (*transicao->validador == '-'))
+  {
+    struct estado * estado1 = procurar_estado(automoto, transicao->estado1);
+    estado1->inicial = transicao->estado1inicial;
+    estado1->final = transicao->estado1final;
+    return;
+  }
+
+  struct estado * estado2 = procurar_estado(automoto, transicao->estado2);
   if(estado2 == NULL)
   {
     estado2 = criar_estado(transicao->estado2,transicao->estado2inicial, transicao->estado2final);
@@ -281,6 +292,16 @@ parse_line(struct linha *infos)
     free(new);
     return NULL;
   }
+
+  if((*infos->val == '-') && (*infos->dest == '-'))
+  {
+    new->estado2 = -1;
+    new->estado2final = false;
+    new->estado2inicial = false;
+    printf("linha: %s, %s, %s\n", infos->orig, infos->val, infos->dest);
+    printf("estado 1: %d inicial:%d final: %d\nestado 2: %d inicial: %d final: %d\n", new->estado1, new->estado1inicial, new->estado1final, new->estado2, new->estado2inicial, new->estado2final);
+    return new;
+  }
   s = infos->dest;
   new->estado2inicial = false;
   new->estado2final = false;
@@ -305,7 +326,10 @@ parse_line(struct linha *infos)
     free(new);
     return NULL;
   }
+  printf("linha: %s, %s, %s\n", infos->orig, infos->val, infos->dest);
+  printf("estado 1: %d inicial:%d final: %d\nestado 2: %d inicial: %d final: %d\n", new->estado1, new->estado1inicial, new->estado1final, new->estado2, new->estado2inicial, new->estado2final);
   return new;
+  
 }
 
 
@@ -372,47 +396,111 @@ limpar_automoto(struct automoto * automoto)
 }
 
 
-
-void
-imprime_automoto(struct automoto * automoto)
+void imprime_automoto(struct automoto * automoto)
 {
   if(!automoto || !automoto->estados)
   {
     printf("O automoto esta vazio\n");
     return;
   }
+
   struct estado * estado = *automoto->estados;
-  while(estado != NULL)
+
+  while (estado != NULL)
   {
     if(estado->transicoes)
     {
-      struct transicao * trasnicao_temp;
-      trasnicao_temp = estado->transicoes;
-      while(trasnicao_temp != NULL)
-      {
-        if(estado->inicial)
+      struct transicao * transicao_temp = estado->transicoes  ;
+
+      while (transicao_temp != NULL)  
+      { 
+        if (estado->inicial)  
         {
           printf("->");
-        }
-        if(estado->final)
+        } 
+        if (estado->final)  
         {
           printf("*");
-        }
-        printf("q%d, %c, ", estado->id, trasnicao_temp->validador);
-        if(trasnicao_temp->destino->inicial)
+        }  
+        printf("q%d, %c, ", estado->id, transicao_temp->validador);
+
+        if (transicao_temp->destino->inicial) 
         {
           printf("->");
-        }
-        if(trasnicao_temp->destino->final)
-        { 
+        } 
+        if (transicao_temp->destino->final) 
+        {
           printf("*");
-        }
-        printf("q%d\n", trasnicao_temp->destino->id);
-        trasnicao_temp = trasnicao_temp->proxima;
-      }
-      estado = estado->proximo;
+        }  
+
+        printf("q%d\n", transicao_temp->destino->id); 
+
+        transicao_temp = transicao_temp->proxima; 
+      } 
     }
+    else
+    {
+      if(estado->id)
+      {
+        printf("->");
+      }
+      if(estado->final)
+      {
+        printf("*");
+      }
+      printf("q%d,-,-\n", estado->id);
+    }
+    estado = estado->proximo;
   }
-
-
 }
+
+
+
+
+
+
+
+
+// void
+// imprime_automoto(struct automoto * automoto)
+// {
+//   if(!automoto || !automoto->estados)
+//   {
+//     printf("O automoto esta vazio\n");
+//     return;
+//   }
+//   struct estado * estado = *automoto->estados;
+//   while(estado != NULL)
+//   {
+//     if(estado->transicoes)
+//     {
+//       struct transicao * trasnicao_temp;
+//       trasnicao_temp = estado->transicoes;
+//       while(trasnicao_temp != NULL)
+//       {
+//         if(estado->inicial)
+//         {
+//           printf("->");
+//         }
+//         if(estado->final)
+//         {
+//           printf("*");
+//         }
+//         printf("q%d, %c, ", estado->id, trasnicao_temp->validador);
+//         if(trasnicao_temp->destino->inicial)
+//         {
+//           printf("->");
+//         }
+//         if(trasnicao_temp->destino->final)
+//         { 
+//           printf("*");
+//         }
+//         printf("q%d\n", trasnicao_temp->destino->id);
+//         trasnicao_temp = trasnicao_temp->proxima;
+//       }
+//       estado = estado->proximo;
+//     }
+//   }
+
+
+// }

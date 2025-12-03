@@ -20,6 +20,7 @@ struct estado
   bool inicial, final;
 };
 
+
 struct transicao
 {
   struct transicao * proxima;
