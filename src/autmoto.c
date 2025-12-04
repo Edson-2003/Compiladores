@@ -1,24 +1,7 @@
 #include "../include/automoto.h"
 
 
-// struct info_aux
-// {
-//   int id1, id2;
-//   unsigned char label;
-//   bool inicial, final;
-// };
 
-// struct transicao_info
-// {
-//     int estado1, estado2;
-//     bool estado1inicial, estado1final, estado2inicial, estado2final;
-//     char *validador;
-// };
-
-// struct linha
-// {
-//     char * orig, *dest, *val;
-// };
 
 struct estado *
 criar_estado(int id, bool inicial, bool final)
@@ -203,7 +186,7 @@ struct linha *
 strip(unsigned char * str)
 {
   if (!str) return NULL;
-  char * value = str_clean(str);
+  unsigned char * value = str_clean(str);
   if (!value) return NULL;
   // printf("%s\n", value);
   struct linha *infos = malloc(sizeof(struct linha));
@@ -239,7 +222,7 @@ strip(unsigned char * str)
     free(infos);
     return NULL;
   }
- infos->orig = cpyrange(value, 0, i1 - 1);
+  infos->orig = cpyrange(value, 0, i1 - 1);
   infos->val  = cpyrange(value, i1 + 1, i2 - 1);
   infos->dest = cpyrange(value, i2 + 1, len - 1);
  // printf("%s\n", infos->val);
@@ -298,8 +281,8 @@ parse_line(struct linha *infos)
     new->estado2 = -1;
     new->estado2final = false;
     new->estado2inicial = false;
-    printf("linha: %s, %s, %s\n", infos->orig, infos->val, infos->dest);
-    printf("estado 1: %d inicial:%d final: %d\nestado 2: %d inicial: %d final: %d\n", new->estado1, new->estado1inicial, new->estado1final, new->estado2, new->estado2inicial, new->estado2final);
+    // printf("linha: %s, %s, %s\n", infos->orig, infos->val, infos->dest);
+    // printf("estado 1: %d inicial:%d final: %d\nestado 2: %d inicial: %d final: %d\n", new->estado1, new->estado1inicial, new->estado1final, new->estado2, new->estado2inicial, new->estado2final);
     return new;
   }
   s = infos->dest;
@@ -326,8 +309,8 @@ parse_line(struct linha *infos)
     free(new);
     return NULL;
   }
-  printf("linha: %s, %s, %s\n", infos->orig, infos->val, infos->dest);
-  printf("estado 1: %d inicial:%d final: %d\nestado 2: %d inicial: %d final: %d\n", new->estado1, new->estado1inicial, new->estado1final, new->estado2, new->estado2inicial, new->estado2final);
+  // printf("linha: %s, %s, %s\n", infos->orig, infos->val, infos->dest);
+  // printf("estado 1: %d inicial:%d final: %d\nestado 2: %d inicial: %d final: %d\n", new->estado1, new->estado1inicial, new->estado1final, new->estado2, new->estado2inicial, new->estado2final);
   return new;
   
 }
@@ -395,6 +378,66 @@ limpar_automoto(struct automoto * automoto)
   return;
 }
 
+bool
+rodar_automoto(struct automoto * automoto, unsigned char * cadeia)
+{ 
+  if(!automoto || !automoto->estados || !cadeia)
+  {
+    return false;
+  }
+  // int tamanho = u_atoi(cadeia);
+  struct estado * estado;
+  estado = *automoto->estados;
+  int i = 0;
+  while(estado != NULL)
+  {
+    if(i == 0)
+    {
+      if(estado->inicial && estado->transicoes)
+      {
+        struct transicao * transicao;
+        transicao = estado->transicoes;
+        while(transicao != NULL)
+        {
+          if(transicao->validador == cadeia[i])
+          {
+            estado = transicao->destino;
+            i++;
+            break;
+          }
+          transicao = transicao->proxima;
+        }
+        if(estado == *automoto->estados)
+        {
+          return false;
+        }
+        continue;
+      }
+      estado = estado->proximo;
+    }
+    if(estado->transicoes)
+    {
+      struct transicao * transicao;
+      transicao = estado->transicoes;
+      while(transicao != NULL)
+      {
+        if(transicao->validador == cadeia[i])
+        {
+          if(transicao->destino->final)
+          {
+            return true;
+          }
+          estado = transicao->destino;
+          i++;
+          continue;
+        }
+      }
+      return false;
+    }
+  }
+  return false;
+}
+
 
 void imprime_automoto(struct automoto * automoto)
 {
@@ -440,7 +483,7 @@ void imprime_automoto(struct automoto * automoto)
     }
     else
     {
-      if(estado->id)
+      if(estado->inicial)
       {
         printf("->");
       }
@@ -458,49 +501,3 @@ void imprime_automoto(struct automoto * automoto)
 
 
 
-
-
-
-// void
-// imprime_automoto(struct automoto * automoto)
-// {
-//   if(!automoto || !automoto->estados)
-//   {
-//     printf("O automoto esta vazio\n");
-//     return;
-//   }
-//   struct estado * estado = *automoto->estados;
-//   while(estado != NULL)
-//   {
-//     if(estado->transicoes)
-//     {
-//       struct transicao * trasnicao_temp;
-//       trasnicao_temp = estado->transicoes;
-//       while(trasnicao_temp != NULL)
-//       {
-//         if(estado->inicial)
-//         {
-//           printf("->");
-//         }
-//         if(estado->final)
-//         {
-//           printf("*");
-//         }
-//         printf("q%d, %c, ", estado->id, trasnicao_temp->validador);
-//         if(trasnicao_temp->destino->inicial)
-//         {
-//           printf("->");
-//         }
-//         if(trasnicao_temp->destino->final)
-//         { 
-//           printf("*");
-//         }
-//         printf("q%d\n", trasnicao_temp->destino->id);
-//         trasnicao_temp = trasnicao_temp->proxima;
-//       }
-//       estado = estado->proximo;
-//     }
-//   }
-
-
-// }

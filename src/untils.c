@@ -130,7 +130,7 @@ int u_atoi(unsigned char *str)
   return(int)(result * sign);
 }
 
-char *
+unsigned char *
 str_clean(unsigned char * str)
 {
   int i = 0;
@@ -143,7 +143,7 @@ str_clean(unsigned char * str)
     }
     i++;
   }
-  char *clean = malloc(c + 1);
+  unsigned char * clean = malloc(c + 1);
   if (!clean) return NULL;
   i = 0;
   int j = 0;
@@ -159,33 +159,8 @@ str_clean(unsigned char * str)
   return clean;
 }
 
-// char * str_clean(char *str)
-// {
-//     if (!str) return NULL;
-
-//     int len = 0;
-//     while (str[len] != '\0') len++;
-
-//     char *clean = malloc(len + 1);
-//     if (!clean) return NULL;
-
-//     int c = 0;
-//     for (int i = 0; i < len; i++)
-//     {
-//         if (str[i] != ' ' && str[i] != '\t' &&
-//             str[i] != '\n' && str[i] != '\r')
-//         {
-//             clean[c++] = str[i];
-//         }
-//     }
-
-//     clean[c] = '\0';
-//     return clean;
-// }
-
-
 char *
-cpyrange(char *str, int ini, int fim)
+cpyrange(unsigned char *str, int ini, int fim)
 {
   if (!str || ini < 0 || fim < ini) return NULL;
   int len = fim - ini + 1;
@@ -208,4 +183,20 @@ u_len(unsigned char * str)
     i++;
   }
   return i;
+}
+
+
+int 
+p_char(unsigned char * str, char * val)
+{
+  int i = 0;
+  while(str[i] != '\0' )
+  {
+    if(str[i] == *val)
+    {
+      return i;
+    }
+    i++;
+  }
+  return -1;
 }

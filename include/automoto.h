@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "../include/Filehandler.h"
 
@@ -30,14 +31,14 @@ struct transicao
 
 struct transicao_info
 {
-    int estado1, estado2;
-    bool estado1inicial, estado1final, estado2inicial, estado2final;
-    char *validador;
+  int estado1, estado2;
+  bool estado1inicial, estado1final, estado2inicial, estado2final;
+  char *validador;
 };
 
 struct linha
 {
-    char * orig, *dest, *val;
+  char * orig, *dest, *val;
 };
 
 
@@ -57,6 +58,11 @@ void imprime_automoto(struct automoto * automoto);
 
 struct linha * strip(unsigned char * str);
 struct transicao_info * parse_line(struct linha *infos);
+
+
+
+
+bool rodar_automoto(struct automoto * automoto, unsigned char * cadeia);
 
 
 void limpar_automoto(struct automoto * automoto);

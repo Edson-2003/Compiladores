@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "analisadorlexico.h": "c",
+    "filehandler.h": "c"
+  }
+}
