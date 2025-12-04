@@ -8,6 +8,19 @@
 #include "automoto.h"
 #include "untils.h"
 
+struct palavra
+{
+  char * palavra;
+  int col;
+  struct palavra * proxima;
+};
+
+struct linha 
+{
+  struct palavra * palavras;
+};
+
+
 
 struct lexemas
 {
@@ -25,6 +38,7 @@ struct automoto_list
 
 struct analizador
 {
+  int qtd_lexemas;
   struct file * tokens_afd;
   struct lexemas * lexemas_encontrados;
   struct automoto_list * validadores;
@@ -36,19 +50,18 @@ struct analizador * criar_analizador(char *tokens_afd);
 
 
 int inserir_lexema_encontrado(struct analizador * analizador, char * lexema);
-int buscar_lexema_encontrado(struct analizador * analizador);
+int buscar_lexema_encontrado(struct analizador * analizador, char * lexema);
+
+struct linha * criar_linha();
+struct palavra * criar_palavra(char * palavra, int coluna);
+int inserir_palavra(struct linha * linha, struct palavra * palavra);
+void destruir_linha(struct linha * linha);
+struct linha * linha_strip(char * entrada);
+
+void rodar_analizador_lexico(struct analizador * analizador, char * arquivo_entrada, char * arquivo_saida);
 
 
 
-
-
-
-
-void inserir_automoto(struct analizador * analizador, char * lexema, char * path);
-void rodar_analizador_lexico(struct analizador * analizador, char * arquivo_saida);
-
-
-
-
+void imprimir_analizador(struct analizador * analizador);
 
 #endif

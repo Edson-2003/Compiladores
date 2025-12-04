@@ -38,6 +38,12 @@ inserir_estado(struct automoto * automoto, struct estado * estado)
   {
     automoto->estados = (struct estado **) malloc(sizeof(struct automoto *));
     *automoto->estados = estado;
+    return;
+  }
+  if(!*automoto->estados)
+  {
+    *automoto->estados = estado;
+    return; 
   }
   struct estado * temp = *automoto->estados;
   if(temp->id == estado->id)
@@ -66,7 +72,15 @@ inserir_estado(struct automoto * automoto, struct estado * estado)
 struct estado *
 procurar_estado(struct automoto * automoto, int estado)
 {
-  if(automoto->estados == NULL)
+  if(!automoto)
+  {
+    return NULL;
+  }
+  if(!automoto->estados)
+  {
+    return NULL;
+  }
+  if(!(*automoto->estados))
   {
     return NULL;
   }
@@ -131,6 +145,14 @@ void
 insere_transicao(struct automoto * automoto, struct transicao_info * transicao)
 {
 
+  if(!automoto)
+  {
+    return;
+  }
+  if(!transicao)
+  {
+    return;
+  }
   struct estado * estado1 = procurar_estado(automoto, transicao->estado1);
   // struct estado * temp
 
@@ -199,7 +221,11 @@ strip(unsigned char * str)
     // printf("value: %c i: %d Virgulas: %d\n", value[i], i, virgulas);
     if (value[i] == ',')
     {
-      if (virgulas == 0) i1 = i;
+      if (virgulas == 0)
+      {
+        i1 = i;
+        i++;
+      } 
       if (virgulas == 1) i2 = i;
       virgulas++;
     }
@@ -321,8 +347,10 @@ criar_automoto(char * caminho)
 {
   struct automoto * new;
   new = (struct automoto *) malloc(sizeof(struct automoto));
+  new->estados = (struct estado **) malloc(sizeof(struct estado *));
+  *new->estados = NULL;
   struct file * arquivo;
-  arquivo = criar_arquivo(caminho);
+  arquivo = criar_arquivo(caminho, true);
   unsigned char * entrada;
   entrada = ler_linha(arquivo);
   while(entrada)

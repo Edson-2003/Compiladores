@@ -33,7 +33,7 @@ criar_item(char * caminho)
 {
   struct item * item;
   item = (struct item *) malloc(sizeof(struct item));
-  item->fd = criar_arquivo(caminho);
+  item->fd = criar_arquivo(caminho,true);
   item->next =  NULL;
   return item;
 }

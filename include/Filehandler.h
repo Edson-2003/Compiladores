@@ -16,10 +16,10 @@ struct file
 };
 
 
-struct file * criar_arquivo(char * path);
+struct file * criar_arquivo(char * path, bool read);
 unsigned char ler_char(struct file * arquivo);
-int ler_int(struct file * arquivo);
 unsigned char * ler_linha(struct file * file);
+
 
 
 

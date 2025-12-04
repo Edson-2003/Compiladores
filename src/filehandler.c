@@ -1,15 +1,19 @@
 #include "../include/Filehandler.h"
 
 struct file *
-criar_arquivo(char * path)
+criar_arquivo(char * path, bool read)
 {
   struct file * file;
   file = (struct file *) malloc(sizeof(struct file));
-  file->file_ptr = fopen(path, "r");
-  // if(file->file_ptr == NULL)
-  // {
-  //   return NULL;
-  // }
+  if(read)
+  {
+    file->file_ptr = fopen(path, "r");
+  }
+  else
+  {
+    file->file_ptr = fopen(path, "w");
+  }
+    
   file->path = (path);
   file->isopen = true;
   return file;
@@ -78,87 +82,6 @@ ler_linha(struct file *file)
     linha[tamanho] = '\0';
     return linha;
 }
-
-
-
-// unsigned char *
-// ler_linha(struct file * file)
-// {
-//   if(!file || !file->file_ptr)
-//   {
-//     return NULL;
-//   }
-//   unsigned char * linha;
-//   linha = calloc(1, sizeof(char));
-//   linha = ler_char(file);
-//   if(linha [0] == EOF)
-//   {
-//     free(linha);
-//     return NULL;
-//   }
-//   int i = 1;
-//   while((linha[i - 1] != EOF) || (linha[i - 1] != '\n'))
-//   {
-//     i++;
-//     realloc(linha, i * sizeof(unsigned char));
-//     linha[i - 1] = ler_char(file);
-//   }
-//   i++;
-//   realloc(linha, i * sizeof(unsigned char));
-//   linha[i - 1] = '\0';
-//   return linha;
-// }
-
-// unsigned char * ler_linha(struct file *file)
-// {
-//     if (!file || !file->file_ptr)
-//         return NULL;
-
-//     int capacidade = 32;   // tamanho inicial
-//     int tamanho = 0;
-
-//     unsigned char *linha = malloc(capacidade);
-//     if (!linha)
-//         return NULL;
-
-//     int c;
-
-//     while ((c = fgetc(file->file_ptr)) != EOF)
-//     {
-//         // se chegar no fim da linha, finaliza
-//         if (c == '\n')
-//             break;
-
-//         // verifica se precisa expandir o buffer
-//         if (tamanho + 1 >= capacidade)
-//         {
-//             capacidade *= 2;
-//             unsigned char *temp = realloc(linha, capacidade);
-//             if (!temp)
-//             {
-//                 free(linha);
-//                 return NULL;
-//             }
-//             linha = temp;
-//         }
-
-//         linha[tamanho++] = (unsigned char)c;
-//     }
-
-//     // se não leu nada e chegou no EOF → fim do arquivo
-//     if (tamanho == 0 && c == EOF)
-//     {
-//         free(linha);
-//         return NULL;
-//     }
-
-//     linha[tamanho] = '\0'; // finaliza string
-
-//     return linha;
-// }
-
-
-
 
 
 int 
