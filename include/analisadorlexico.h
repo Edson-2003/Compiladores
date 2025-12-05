@@ -10,12 +10,12 @@
 
 struct palavra
 {
-  char * palavra;
+  unsigned char * palavra;
   int col;
   struct palavra * proxima;
 };
 
-struct linha 
+struct line 
 {
   struct palavra * palavras;
 };
@@ -52,12 +52,15 @@ struct analizador * criar_analizador(char *tokens_afd);
 int inserir_lexema_encontrado(struct analizador * analizador, char * lexema);
 int buscar_lexema_encontrado(struct analizador * analizador, char * lexema);
 
-struct linha * criar_linha();
-struct palavra * criar_palavra(char * palavra, int coluna);
-int inserir_palavra(struct linha * linha, struct palavra * palavra);
-void destruir_linha(struct linha * linha);
-struct linha * linha_strip(char * entrada);
+struct line * criar_line();
+struct palavra * criar_palavra(unsigned char * palavra, int coluna);
+int inserir_palavra(struct line * line, struct palavra * palavra);
+void destruir_line(struct line * line);
+struct line * line_strip(unsigned char * entrada);
+void imprimir_line(struct line * line);
 
+
+void valida_line(struct analizador * analizador, struct line * line);
 void rodar_analizador_lexico(struct analizador * analizador, char * arquivo_entrada, char * arquivo_saida);
 
 

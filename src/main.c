@@ -12,8 +12,8 @@ main()
   // printf("imprimiu op automoto\n");
   // limpar_automoto(automoto);
   struct analizador * analizador = criar_analizador("../automatos/lista.tokensafd");
-  imprimir_analizador(analizador);
-  
+  // imprimir_analizador(analizador);
+  rodar_analizador_lexico(analizador, "./teste", "");
   
   return 0;
 }

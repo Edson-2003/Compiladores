@@ -153,17 +153,17 @@ buscar_lexema_encontrado(struct analizador * analizador, char * lexema)
   return -1;
 }
 
-struct linha  * 
-criar_linha()
+struct line  * 
+criar_line()
 {
-  struct linha * new;
-  new = (struct linha *) malloc(sizeof(struct linha *));
+  struct line * new;
+  new = (struct line *) malloc(sizeof(struct line *));
   new->palavras = NULL;
   return new;
 }
 
 struct palavra * 
-criar_palavra(char * palavra, int coluna)
+criar_palavra(unsigned char * palavra, int coluna)
 {
   struct palavra * new;
   new = (struct palavra *) malloc(sizeof(struct palavra));
@@ -174,19 +174,19 @@ criar_palavra(char * palavra, int coluna)
 }
 
 int 
-inserir_palavra(struct linha * linha, struct palavra * palavra)
+inserir_palavra(struct line * line, struct palavra * palavra)
 {
-  if(!linha || !palavra)
+  if(!line || !palavra)
   {
-    return;
+    return -1;
   }
-  if(!linha->palavras)
+  if(!line->palavras)
   {
-    linha->palavras = palavra;
+    line->palavras = palavra;
     return palavra->col;
   }
   struct palavra * p;
-  p = linha->palavras;
+  p = line->palavras;
   while (p->proxima)
   {
     p = p->proxima;
@@ -197,81 +197,187 @@ inserir_palavra(struct linha * linha, struct palavra * palavra)
 
 
 void
-destruir_linha(struct linha * linha)
+destruir_line(struct line * line)
 {
-  if(!linha)
+  if(!line)
   {
     return;
   }
-  if(!linha->palavras)
+  if(!line->palavras)
   {
-    free(linha);
+    free(line);
     return;
   }
   struct palavra * p;
-  p = linha->palavras;
+  p = line->palavras;
   while(p)
   {
-    linha->palavras = p->proxima;
+    line->palavras = p->proxima;
     free(p->palavra);
-    free(p->col);
     free(p);
-    p = linha->palavras;
+    p = line->palavras;
   }
-  free(linha);
+  free(line);
 }
 
-struct linha * 
-linha_strip(char * entrada)
+// struct line * 
+// line_strip(unsigned char * entrada)
+// {
+//   if(!entrada)
+//   {
+//     return NULL;
+//   }
+//   struct line * line = criar_line();
+//   int col = 0;
+//   int inicio = 0;
+
+//   while(entrada[col] != '\0')
+//   {
+//     if((entrada[col] == '\n') || (entrada[col] == '\t'))
+//     {
+//       inicio ++;
+//       col ++;
+//       continue;
+//     }
+//     while((entrada[col] != '\n') && (entrada[col] != '\t') && (entrada[col] != ' ') && (entrada[col] != '\0'))
+//     {
+//       col ++;
+//     }
+//     unsigned char *nova_palavra = (unsigned char *) cpyrange(entrada, inicio, col);
+//     struct palavra * new;
+//     new = criar_palavra(nova_palavra, inicio);
+//     if(inicio == inserir_palavra(line, new))
+//     {
+//       inicio = col;
+//       continue;
+//     }
+//     inicio = 0;
+//     col = 0;
+//   }
+//   return line;
+// }
+
+struct line * 
+line_strip(unsigned char * entrada)
 {
   if(!entrada)
   {
     return NULL;
   }
-  struct linha * linha = criar_linha();
+  struct line * line = criar_line();
   int col = 0;
   int inicio = 0;
 
-  while(entrada[col] != '\0')
+  while (entrada[col] != '\0')
   {
-    if((entrada[col] == '\n') || (entrada[col] == '\t'))
+    while (entrada[col] == ' ' || entrada[col] == '\n' || entrada[col] == '\t')
     {
-      inicio ++;
-      col ++;
-      continue;
+      col++;
     }
-    while((entrada[col] == '\n') || (entrada[col] == '\t'))
+
+    inicio = col; 
+
+    while (entrada[col] != ' ' && entrada[col] != '\n' && entrada[col] != '\t' && entrada[col] != '\0')
     {
-      col ++;
+      col++;
     }
-    char *nova_palavra = cpyrange(entrada, inicio, col);
-    struct palavra * new;
-    new = criar_palavra(nova_palavra, inicio);
-    if(inicio == inserir_palavra(linha, nova_palavra))
-    {
-      inicio = col;
-      continue;
-    }
-    inicio = 0;
-    col = 0;
+
+    if (inicio == col)
+    break;
+
+    unsigned char *nova_palavra = (unsigned char *) cpyrange(entrada, inicio, col);
+
+    struct palavra * new = criar_palavra(nova_palavra, inicio);
+
+    inserir_palavra(line, new);
+
+    if (entrada[col] != '\0')
+    col++;
   }
 
+  return line;
 }
+
+
+
+
+void 
+imprimir_line(struct line * line)
+{
+  if(!line)
+  {
+    printf("esta line esta vazia\n");
+  }
+  if(!line->palavras)
+  {
+    printf("esta line esta vazia\n");
+  }
+  struct palavra * p;
+  p = line->palavras;
+  while(p)
+  {
+    printf("col: %d, %s\n", p->col, p->palavra);
+    p = p->proxima;
+  }
+  return;
+
+}
+
+
+void 
+valida_line(struct analizador * analizador, struct line * line)
+{
+  if(!analizador) return;
+  if(!analizador->validadores) return;
+  if(!line) return;
+  if(!line->palavras) return;
+  struct palavra * p;
+  p = line->palavras;
+  while(p)
+  {
+    struct automoto_list *validador = analizador->validadores;
+    while(validador)
+    {
+      if(rodar_automoto(validador->automoto, p->palavra))
+      {
+        int id = buscar_lexema_encontrado(analizador, validador->lexema);
+        if(id < 0)
+        {
+          id = inserir_lexema_encontrado(analizador, validador->lexema);
+        }
+        printf("id: %d, lexema: %s, token: %s, col: %d", id, p->palavra, validador->lexema, p->col);
+        break;
+      }
+      validador = validador->proximo;
+    }
+    p = p->proxima;
+  }
+}
+
 
 
 
 void 
 rodar_analizador_lexico(struct analizador * analizador, char * arquivo_entrada, char * arquivo_saida)
 {
-  struct file * fentrada, * fsaida;
+  struct file * fentrada;
+  // struct file * fsaida;
   fentrada = criar_arquivo(arquivo_entrada, true);
-  fsaida = criar_arquivo(arquivo_saida, false);
+  // fsaida = criar_arquivo(arquivo_saida, false);
   int linhas = 0;
-  int colunas = 0;
+  // int colunas = 0;
   unsigned char * entrada = ler_linha(fentrada);
   while(entrada)
   {
-    
+    linhas++;
+    struct line * nova_line = criar_line();
+    nova_line = line_strip(entrada);
+    printf("Imprimindo palavras encontrads na linha: %d\n", linhas);
+
+    valida_line(analizador, nova_line);
+
+    destruir_line(nova_line);
+    entrada = ler_linha(fentrada);
   }
 
   return;
